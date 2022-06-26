@@ -14,7 +14,7 @@ jobs:
       gh_tag: ${{ steps.wireguard-ui_version.outputs.gh_tag }}
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-go@v2
+      - uses: actions/setup-go@v3
       - name: Get wireguard-ui version
         id: wireguard-ui_version
         run: |

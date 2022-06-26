@@ -27,13 +27,15 @@ jobs:
     runs-on: ubuntu-latest
     needs: wireguard-ui_version
     env:
-      PLATFORMS: linux/amd64,linux/arm64/v8,linux/arm/v7
+      PLATFORMS: linux/amd64,linux/arm64,linux/arm/v7
       DOCKERHUB_USERNAME: isac322
     steps:
       - uses: actions/checkout@v3
         with:
           repository: ngoduykhanh/wireguard-ui
           ref: ${{ needs.wireguard-ui_version.outputs.gh_tag }}
+      - name: disable test
+        run: sed -i -E 's/GOOS=\$\{TARGETOS\} GOARCH=\$\{TARGETARCH\}//' Dockerfile
       - name: Docker meta
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v4.0.1

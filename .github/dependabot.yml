@@ -6,6 +6,10 @@ updates:
     schedule:
       interval: "daily"
   - package-ecosystem: "gomod"
-    directory: "/"
+    directory: "/version"
+    schedule:
+      interval: "daily"
+  - package-ecosystem: "gomod"
+    directory: "/latest"
     schedule:
       interval: "daily"

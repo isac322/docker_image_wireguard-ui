@@ -1,4 +1,4 @@
-module docker_image_wireguard-ui
+module latest
 
 go 1.18
 

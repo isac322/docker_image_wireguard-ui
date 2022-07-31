@@ -11,19 +11,19 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       version: ${{ steps.wireguard-ui_version.outputs.version }}
-      gh_tag: ${{ steps.wireguard-ui_version.outputs.gh_tag }}
+      gh_commit: ${{ steps.wireguard-ui_version.outputs.gh_commit }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-go@v3
       - name: Get wireguard-ui version
-        working-directory: versioned
+        working-directory: latest
         id: wireguard-ui_version
         run: |
-          GH_TAG=$(go list -f '{{ .Version }}' -m 'github.com/ngoduykhanh/wireguard-ui')
+          GIT_COMMIT=$(go list -f '{{ .Version }}' -m 'github.com/ngoduykhanh/wireguard-ui') | sed -E 's/(.+)-(.+)-(.+)/\3/'
           VERSION=$(go list -f '{{ .Version }}' -m 'github.com/ngoduykhanh/wireguard-ui' | sed -E 's/v?(.+)/\1/')
           echo $GH_TAG $VERSION
           echo "::set-output name=version::${VERSION}"
-          echo "::set-output name=gh_tag::${GH_TAG}"
+          echo "::set-output name=gh_commit::${GIT_COMMIT}"
   docker:
     runs-on: ubuntu-latest
     needs: wireguard-ui_version
@@ -35,17 +35,18 @@ jobs:
         id: changed-files
         uses: tj-actions/changed-files@v24
         with:
-          files: versioned/go.*
+          files: latest/go.*
       - uses: actions/checkout@v3
         with:
           repository: ngoduykhanh/wireguard-ui
-          ref: ${{ needs.wireguard-ui_version.outputs.gh_tag }}
+          ref: ${{ needs.wireguard-ui_version.outputs.gh_commit }}
       - name: patch platform
         run: sed -i -E -e 's/GOOS=\$\{TARGETOS\} GOARCH=\$\{TARGETARCH\}//' -e 's/^ARG\W+(:?TARGETOS|TARGETARCH)=.+$//' Dockerfile
       - name: Docker meta
         id: docker_meta
         uses: crazy-max/ghaction-docker-meta@v4.0.1
         with:
+          flavor: latest=true
           images: ${{ env.DOCKERHUB_USERNAME }}/wireguard-ui
           tags: |
             type=semver,pattern={{version}},value=${{ needs.wireguard-ui_version.outputs.version }}

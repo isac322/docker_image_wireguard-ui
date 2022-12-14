@@ -36,7 +36,7 @@ jobs:
           fetch-depth: 2
       - name: Get changed files
         id: changed-files
-        uses: tj-actions/changed-files@v29.0.5
+        uses: tj-actions/changed-files@v34.6.0
         with:
           files: versioned/go.*
       - uses: actions/checkout@v3
